@@ -44,7 +44,7 @@ chart
     .attr('y', d => y(d.step))
     .attr('width', d => x(d.value))
     .attr('height', y.bandwidth())
-    .attr('fill', d3.hsl(palette.orange).darker(0.5))
+    .attr('fill', (d, i) => d3.hsl(palette.orange).darker((Math.abs(i - data.length) * 2) / 10))
 
 chart
     .selectAll('.data-labels')
