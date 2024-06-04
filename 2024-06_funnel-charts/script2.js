@@ -3,8 +3,8 @@ import { palette } from "../colours.js"
 import { data } from "./data.js"
 
 const { chart, width, height } = getChart({
-    id: 'chart1',
-    margin: getMargin({ left: 128, bottom: 16, top: 0, right: 16 })
+    id: 'chart2',
+    margin: getMargin({ left: 128, bottom: 52, top: 0, right: 32 })
 })
 
 const x = d3
@@ -22,7 +22,7 @@ chart
     .selectAll('.data-point')
     .data(data)
     .join('rect')
-    .attr('x', d => x(50 - (d.value / 2)))
+    .attr('x', d => x(0))
     .attr('y', d => y(d.step))
     .attr('width', d => x(d.value))
     .attr('height', y.bandwidth())
@@ -32,10 +32,14 @@ addAxis({
     chart,
     height,
     width,
+    x,
     y,
+    hideXdomain: true,
     hideYdomain: true,
+    xNumTicks: 5,
+    xFormat: d => `${d}%`,
     fontSize: '0.9rem',
-    colour: palette.axis
+    colour: palette.axis,
 })
 
 chart
@@ -43,7 +47,7 @@ chart
     .data(data)
     .join('text')
     .attr('class', 'font-bold')
-    .attr('x', d => x(50))
+    .attr('x', d => x(d.value) / 2)
     .attr('y', d => y(d.step) + y.bandwidth() / 2)
     .attr('fill', '#FFFFFF')
     .attr('font-size', '1rem')
@@ -54,10 +58,10 @@ chart
 const getLinkPath = (d, i) => {
     if (data[i + 1] !== undefined) {
         return `
-        M ${x(50 - (d.value / 2))} ${y(d.step) + y.bandwidth()} 
-        H ${x(50 + (d.value / 2))} 
-        L ${x(50 + (data[i + 1].value / 2))} ${y(data[i + 1].step)} 
-        H ${x(50 - (data[i + 1].value / 2))} Z
+        M ${x(0)} ${y(d.step) + y.bandwidth()} 
+        H ${x(d.value)} 
+        L ${x(data[i + 1].value)} ${y(data[i + 1].step)} 
+        H ${x(0)} Z
         `
     }
 }
