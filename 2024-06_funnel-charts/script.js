@@ -1,4 +1,4 @@
-import { getChart } from "../node_modules/visual-components/index.js"
+import { getChart, getMargin } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
 
 const inital = 100
@@ -14,13 +14,16 @@ const home = distribution - homeLoss
 
 const data = [
     { step: 'Energy Source', value: inital },
-    { step: 'production', value: production },
-    { step: 'transmission', value: transmission },
-    { step: 'distribution', value: distribution },
-    { step: 'home', value: home },
+    { step: 'Generated', value: production },
+    { step: 'Transmitted', value: transmission },
+    { step: 'Distributed', value: distribution },
+    { step: 'Used by Houses', value: home },
 ]
 
-const { chart, width, height } = getChart({ id: 'chart1' })
+const { chart, width, height } = getChart({
+    id: 'chart1',
+    margin: getMargin({ left: 128, bottom: 16, top: 0, right: 16 })
+})
 
 const x = d3
     .scaleLinear()
@@ -42,6 +45,31 @@ chart
     .attr('width', d => x(d.value))
     .attr('height', y.bandwidth())
     .attr('fill', d3.hsl(palette.orange).darker(0.5))
+
+chart
+    .selectAll('.data-labels')
+    .data(data)
+    .join('text')
+    .attr('x', -16)
+    .attr('y', d => y(d.step) + y.bandwidth() / 2)
+    .attr('fill', palette.axis)
+    .attr('font-size', '0.9rem')
+    .attr('text-anchor', 'end')
+    .attr('dominant-baseline', 'middle')
+    .text(d => d.step)
+
+chart
+    .selectAll('.data-values')
+    .data(data)
+    .join('text')
+    .attr('class', 'font-bold')
+    .attr('x', d => x(50))
+    .attr('y', d => y(d.step) + y.bandwidth() / 2)
+    .attr('fill', '#FFFFFF')
+    .attr('font-size', '1rem')
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .text(d => `${d.value}%`)
 
 const getLinkPath = (d, i) => {
     if (data[i + 1] !== undefined) {
