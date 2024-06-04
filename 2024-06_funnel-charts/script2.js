@@ -4,7 +4,7 @@ import { data } from "./data.js"
 
 const { chart, width, height } = getChart({
     id: 'chart2',
-    margin: getMargin({ left: 128, bottom: 52, top: 0, right: 32 })
+    margin: getMargin({ left: 128, bottom: 32, top: 0, right: 32 })
 })
 
 const x = d3
@@ -38,6 +38,7 @@ addAxis({
     hideYdomain: true,
     xNumTicks: 5,
     xFormat: d => `${d}%`,
+    xTickPadding: -10,
     fontSize: '0.9rem',
     colour: palette.axis,
 })
