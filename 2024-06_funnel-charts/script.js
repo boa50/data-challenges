@@ -4,7 +4,7 @@ import { data } from "./data.js"
 
 const { chart, width, height } = getChart({
     id: 'chart1',
-    margin: getMargin({ left: 128, bottom: 16, top: 0, right: 16 })
+    margin: getMargin({ left: 128, bottom: 64, top: 0, right: 16 })
 })
 
 const x = d3
