@@ -33,17 +33,36 @@ getData().then(data => {
         .keys(keys)
         (data)
 
+    const area = d3
+        .area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+
 
     chart
         .selectAll('data-points')
         .data(stackedData)
         .join('path')
-        .style('fill', function (d) { return colour(d.key); })
-        .attr('d', d3.area()
-            .x(function (d, i) { return x(d.data.year); })
-            .y0(function (d) { return y(d[0]); })
-            .y1(function (d) { return y(d[1]); })
-        )
+        .style('fill', d => colour(d.key))
+        .attr('d', area)
+
+    // Adding legend directly on the chart
+    const addLegend = txt => {
+        chart
+            .append('text')
+            .attr('x', x('2000'))
+            .attr('y', y(txt === 'Women' ? 800 : -1000))
+            .attr('font-size', '2rem')
+            .attr('fill', '#FFFFFF')
+            .attr('font-weight', 500)
+            .attr('dominant-baseline', 'middle')
+            .attr('opacity', 0.85)
+            .text(txt)
+    }
+
+    addLegend('Women')
+    addLegend('Men')
 
     addAxis({
         chart,
