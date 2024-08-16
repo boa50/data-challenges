@@ -5,13 +5,6 @@ const getDateObject = (d, isFullDateField) =>
         new Date(`${d + 'T00:00:00'}`) :
         new Date(d, 0, 1, 0, 0, 0, 0)
 
-// const getDateObject = (d, dateField, yearField) =>
-//     dateField !== undefined ?
-//         new Date(`${d[dateField] + 'T00:00:00'}`) :
-//         yearField !== undefined ?
-//             new Date(d[yearField], 0, 1, 0, 0, 0, 0) :
-//             new Date()
-
 export const prepareLineData = (data, dateField, yearField, isRankedData) => {
     const groups = new Set(data.map(d => d.group))
     const isFullDateField = dateField !== undefined
@@ -20,7 +13,6 @@ export const prepareLineData = (data, dateField, yearField, isRankedData) => {
     const dateValues = Array.from(d3.rollup(data, ([d]) => +d.value, d => d[timeField], d => d.group))
         .map(([date, data]) => [getDateObject(date, isFullDateField), data])
         .sort(([a], [b]) => d3.ascending(a, b))
-
 
     const rank = getValue => {
         const data = Array.from(groups, group => ({ group: group, value: getValue(group) }))

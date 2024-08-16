@@ -27,15 +27,15 @@ const lines = (chart, data, prev, next, x, y) => {
     let line = chart
         .selectAll('.data-point')
 
-    const dataPerGroup = d3.group(data, d => d.group)
+    // const dataPerGroup = d3.group(data, d => d.group)
     const colour = d3
         .scaleOrdinal()
         .range([palette.reddishPurple, palette.blue])
 
-    const lineGenerator = d3
-        .line()
-        .x(d => x(d.year))
-        .y(d => y(d.value))
+    // const lineGenerator = d3
+    //     .line()
+    //     .x(d => x(d.year))
+    //     .y(d => y(d.value))
 
     // chart
     //     .selectAll('.data-point')
@@ -47,14 +47,23 @@ const lines = (chart, data, prev, next, x, y) => {
     //     .attr('stroke-width', 1)
     //     .attr('d', d => lineGenerator(d[1]))
 
-    return ([date, data], transition) => line = line
-        .data(dataPerGroup)
+    return (data, transition) => line = line
+        .data(d3.group(data, d => d.group))
         .join('path')
         .attr('class', 'data-point')
         .attr('fill', 'none')
         .attr('stroke', d => colour(d[0]))
         .attr('stroke-width', 1)
-        .attr('d', d => lineGenerator(d[1]))
+        .call(
+            line => line
+                // .transition(transition)
+                .attr('d', d => d3
+                    .line()
+                    .x(d => x(d.date))
+                    .y(d => y(d.value))
+                    (d[1])
+                )
+        )
     // .data(data.slice(0, n), d => d.name)
     // .join(
     //     enter => enter
@@ -106,12 +115,15 @@ const updateLineChart = (lineChartFuncs, keyframe, transition) => {
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
 
-    const duration = 250
+    const duration = 0
     // const length = 100
+
+    const { keyframes, prev, next } = prepareLineData(data, undefined, 'year', false)
 
     const x = d3
         .scaleLinear()
-        .domain(d3.extent(data, d => d.year))
+        // .domain(d3.extent(data, d => d.year))
+        .domain(d3.extent(keyframes, d => d[0]))
         .range([0, width])
 
     const y = d3
@@ -119,24 +131,41 @@ getData().then(data => {
         .domain([0, d3.max(data, d => d.value)].map(d => d * 1.05))
         .range([height, 0])
 
-    const { keyframes, prev, next } = prepareLineData(data, undefined, 'year', false)
 
     const playChart = async () => {
         const lineChartFuncs = createLineChart(chart, data, keyframes, prev, next, x, y)
 
-        for (const keyframe of keyframes) {
+        for (let i = 1; i < keyframes.length; i++) {
+            // console.log(keyframes.slice(0, i));
+            const keyframeData = []
+            keyframes.slice(0, i)
+                .forEach(d => d[1].forEach(v => { keyframeData.push({ date: d[0], group: v.group, value: v.value }) }))
+
             const transition = chart
                 .transition()
                 .duration(duration)
                 .ease(d3.easeLinear)
 
-            updateLineChart(lineChartFuncs, keyframe, transition)
+            updateLineChart(lineChartFuncs, keyframeData, transition)
 
             await transition.end()
         }
     }
 
     playChart()
+
+
+    // const returnArray = []
+
+    // keyframes.slice(0, 3)
+    //     .forEach(d => d[1].forEach(v => { returnArray.push({ date: d[0], group: v.group, value: v.value }) }))
+    // console.log(
+    //     returnArray
+    // );
+
+    // console.log(d3.group(data, d => d.group));
+    // console.log(d3.group(returnArray, d => d.group));
+
 
 
 
@@ -258,7 +287,7 @@ getData().then(data => {
         y,
         xLabel: 'Year',
         yLabel: 'Number of Athletes',
-        xFormat: d => d,
+        xFormat: d3.utcFormat("%Y"),
         yFormat: d => d3.format('.1s')(Math.abs(d)),
         hideXdomain: true,
         hideYdomain: true,
