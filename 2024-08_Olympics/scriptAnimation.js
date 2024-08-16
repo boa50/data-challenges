@@ -23,18 +23,91 @@ const getData = () =>
 
 const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging chart - Animated' })
 
-getData().then(data => {
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
-
-    const duration = 250
-    const length = 100
-
-    // const preparedData = prepareLineData(data, undefined, 'year', ['female', 'male'])
+const lines = (chart, data, prev, next, x, y) => {
+    let line = chart
+        .selectAll('.data-point')
 
     const dataPerGroup = d3.group(data, d => d.group)
     const colour = d3
         .scaleOrdinal()
         .range([palette.reddishPurple, palette.blue])
+
+    const lineGenerator = d3
+        .line()
+        .x(d => x(d.year))
+        .y(d => y(d.value))
+
+    // chart
+    //     .selectAll('.data-point')
+    //     .data(dataPerGroup)
+    //     .join('path')
+    //     .attr('class', 'data-point')
+    //     .attr('fill', 'none')
+    //     .attr('stroke', d => colour(d[0]))
+    //     .attr('stroke-width', 1)
+    //     .attr('d', d => lineGenerator(d[1]))
+
+    return ([date, data], transition) => line = line
+        .data(dataPerGroup)
+        .join('path')
+        .attr('class', 'data-point')
+        .attr('fill', 'none')
+        .attr('stroke', d => colour(d[0]))
+        .attr('stroke-width', 1)
+        .attr('d', d => lineGenerator(d[1]))
+    // .data(data.slice(0, n), d => d.name)
+    // .join(
+    //     enter => enter
+    //         .append('rect')
+    //         .attr('fill', d => colour(rawData, d))
+    //         .attr('height', y.bandwidth())
+    //         .attr('x', x(0))
+    //         .attr('y', d => y(getRank(prev, d)))
+    //         .attr('width', d => x(getValue(prev, d)) - x(0)),
+    //     update => update,
+    //     exit => exit
+    //         .transition(transition)
+    //         .remove()
+    //         .attr('y', d => y(getRank(next, d)))
+    //         .attr('width', d => x(getValue(next, d)) - x(0))
+    // )
+    // .call(
+    //     bar => bar
+    //         .transition(transition)
+    //         .attr('y', d => y(d.rank))
+    //         .attr('width', d => x(d.value) - x(0))
+    // )
+}
+
+const createLineChart = (chart, data, keyframes, prev, next, x, y) => {
+    const updateLines = lines(chart, data, prev, next, x, y)
+    // const updateLabels = labels(svg, prev, next)
+    // const updateImages = images(svg, prev, next)
+    // const updateAxis = axis(svg)
+    // const updateTicker = ticker(svg, keyframes)
+
+    return { updateLines }
+}
+
+const updateLineChart = (lineChartFuncs, keyframe, transition) => {
+    // const { updateBars, updateLabels, updateImages, updateAxis, updateTicker } = lineChartFuncs
+    const { updateLines } = lineChartFuncs
+
+    // Extract the top bar’s value
+    // x.domain([0, keyframe[1][0].value])
+
+    updateLines(keyframe, transition)
+    // updateLabels(keyframe, transition)
+    // updateImages(keyframe, transition)
+    // updateAxis(keyframe, transition)
+    // updateTicker(keyframe, transition)
+}
+
+getData().then(data => {
+    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
+
+    const duration = 250
+    // const length = 100
 
     const x = d3
         .scaleLinear()
@@ -46,27 +119,65 @@ getData().then(data => {
         .domain([0, d3.max(data, d => d.value)].map(d => d * 1.05))
         .range([height, 0])
 
-    const transitionLine = chart
-        .transition()
-        .duration(duration * (length + 4))
-        .ease(d3.easeLinear)
+    const { keyframes, prev, next } = prepareLineData(data, undefined, 'year', false)
 
-    const line = d3
-        .line()
-        .x(d => x(d.year))
-        .y(d => y(d.value))
+    const playChart = async () => {
+        const lineChartFuncs = createLineChart(chart, data, keyframes, prev, next, x, y)
 
-    const path = chart
-        .selectAll('.drewLine')
-        .data(dataPerGroup)
-        .join('path')
-        .attr('fill', 'none')
-        .attr('stroke', d => colour(d[0]))
-        .attr('stroke-width', 1)
-        .attr('d', d => line(d[1]))
+        for (const keyframe of keyframes) {
+            const transition = chart
+                .transition()
+                .duration(duration)
+                .ease(d3.easeLinear)
+
+            updateLineChart(lineChartFuncs, keyframe, transition)
+
+            await transition.end()
+        }
+    }
+
+    playChart()
 
 
-    animateSingleLine(path, transitionLine)
+
+    // const dataPerGroup = d3.group(data, d => d.group)
+    // const colour = d3
+    //     .scaleOrdinal()
+    //     .range([palette.reddishPurple, palette.blue])
+
+    // const x = d3
+    //     .scaleLinear()
+    //     .domain(d3.extent(data, d => d.year))
+    //     .range([0, width])
+
+    // const y = d3
+    //     .scaleLinear()
+    //     .domain([0, d3.max(data, d => d.value)].map(d => d * 1.05))
+    //     .range([height, 0])
+
+    // const transitionLine = chart
+    //     .transition()
+    //     .duration(duration * (length + 4))
+    //     .ease(d3.easeLinear)
+
+    // const line = d3
+    //     .line()
+    //     .x(d => x(d.year))
+    //     .y(d => y(d.value))
+
+    // const path = chart
+    //     .selectAll('.drewLine')
+    //     .data(dataPerGroup)
+    //     .join('path')
+    //     .attr('fill', 'none')
+    //     .attr('stroke', d => colour(d[0]))
+    //     .attr('stroke-width', 1)
+    //     .attr('d', d => line(d[1]))
+
+
+    // animateSingleLine(path, transitionLine)
+
+
 
 
 
