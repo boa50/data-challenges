@@ -1,3 +1,5 @@
+import { prepareLineData } from "./prepareData.js"
+
 export const animateSingleLine = (path, transition) => {
     const pathLength = path.node().getTotalLength()
 
@@ -8,9 +10,26 @@ export const animateSingleLine = (path, transition) => {
         .attr('stroke-dashoffset', 0)
 }
 
-export const animateMultipleLines = (chart, keyframes, x, y, colour) => {
-    const playChart = async () => {
-        const lineChartFuncs = createLineChart(chart, x, y, colour)
+export const animateMultipleLines = ({
+    chart,
+    data,
+    dateField = undefined,
+    yearField = undefined,
+    isRankedData = false,
+    x,
+    y,
+    updateAxis,
+    lineAttrs
+}) => {
+    const { keyframes } = prepareLineData({
+        data,
+        dateField,
+        yearField,
+        isRankedData
+    })
+
+    const runChart = async () => {
+        const updateLines = createLineChart(chart, x, y, lineAttrs)
 
         for (let i = 1; i < keyframes.length; i++) {
             const keyframeData = []
@@ -22,17 +41,17 @@ export const animateMultipleLines = (chart, keyframes, x, y, colour) => {
                 .duration(0)
                 .ease(d3.easeLinear)
 
-            updateLineChart(lineChartFuncs, keyframeData, transition)
+            updateLineChart(updateLines, keyframeData, updateAxis, x, y)
 
             await transition.end()
         }
     }
 
-    playChart()
+    runChart()
 }
 
 
-function lines(chart, x, y, colour) {
+function createLineChart(chart, x, y, lineAttrs) {
     let line = chart
         .selectAll('.data-point')
 
@@ -41,8 +60,7 @@ function lines(chart, x, y, colour) {
         .join('path')
         .attr('class', 'data-point')
         .attr('fill', 'none')
-        .attr('stroke', d => colour(d[0]))
-        .attr('stroke-width', 1)
+        .call(line => lineAttrs(line))
         .call(
             line => line
                 .attr('d', d => d3
@@ -54,26 +72,12 @@ function lines(chart, x, y, colour) {
         )
 }
 
-function createLineChart(chart, x, y, colour) {
-    const updateLines = lines(chart, x, y, colour)
-    // const updateLabels = labels(svg, prev, next)
-    // const updateImages = images(svg, prev, next)
-    // const updateAxis = axis(svg)
-    // const updateTicker = ticker(svg, keyframes)
-
-    return { updateLines }
-}
-
-function updateLineChart(lineChartFuncs, keyframe) {
-    // const { updateBars, updateLabels, updateImages, updateAxis, updateTicker } = lineChartFuncs
-    const { updateLines } = lineChartFuncs
-
-    // Extract the top bar’s value
-    // x.domain([0, keyframe[1][0].value])
-
+function updateLineChart(updateLines, keyframe, updateAxis, x, y) {
     updateLines(keyframe)
-    // updateLabels(keyframe, transition)
-    // updateImages(keyframe, transition)
-    // updateAxis(keyframe, transition)
-    // updateTicker(keyframe, transition)
+
+    if (updateAxis !== undefined) {
+        x.domain(d3.extent(keyframe, d => d.date))
+        y.domain([0, d3.max(keyframe, d => d.value)].map(d => d * 1.05))
+        updateAxis(keyframe)
+    }
 }

@@ -5,7 +5,12 @@ const getDateObject = (d, isFullDateField) =>
         new Date(`${d + 'T00:00:00'}`) :
         new Date(d, 0, 1, 0, 0, 0, 0)
 
-export const prepareLineData = (data, dateField, yearField, isRankedData) => {
+export const prepareLineData = ({
+    data,
+    dateField = undefined,
+    yearField = undefined,
+    isRankedData = false
+}) => {
     const groups = new Set(data.map(d => d.group))
     const isFullDateField = dateField !== undefined
     const timeField = isFullDateField ? dateField : yearField

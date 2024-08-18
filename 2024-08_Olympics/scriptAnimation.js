@@ -1,6 +1,5 @@
-import { getChart, appendChartContainer, addAxis, getMargin } from "../node_modules/visual-components/index.js"
+import { getChart, appendChartContainer, addAxis, getMargin, updateXaxis, updateYaxis } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
-import { prepareLineData } from "./animation/prepareData.js"
 import { animateMultipleLines } from "./animation/line.js"
 
 const getData = () =>
@@ -13,7 +12,7 @@ const getData = () =>
                         long_data.push({
                             'year': row['year'],
                             'group': colname,
-                            'value': colname === 'male' ? +row[colname] : +row[colname]
+                            'value': colname === 'male' ? -row[colname] : +row[colname]
                         })
                 })
             })
@@ -25,11 +24,9 @@ const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging char
 
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
-    const { keyframes, prev, next } = prepareLineData(data, undefined, 'year', false)
 
     const x = d3
         .scaleLinear()
-        .domain(d3.extent(keyframes, d => d[0]))
         .range([0, width])
 
     const y = d3
@@ -41,7 +38,57 @@ getData().then(data => {
         .scaleOrdinal()
         .range([palette.reddishPurple, palette.blue])
 
-    animateMultipleLines(chart, keyframes, x, y, colour)
+    const xFormat = d3.utcFormat("%Y")
+    const yFormat = d => d3.format('.1s')(Math.abs(d))
+
+    addAxis({
+        chart,
+        height,
+        width,
+        colour: palette.axis,
+        x,
+        y,
+        xLabel: 'Year',
+        yLabel: 'Number of Athletes',
+        xFormat,
+        yFormat,
+        hideXdomain: true,
+        hideYdomain: true,
+    })
+
+    const updateAxis = keyframe => {
+        const maxValue = d3.max(keyframe, d => Math.abs(d.value))
+        y.domain([-maxValue, maxValue].map(d => d * 1.05))
+
+        updateXaxis({
+            chart,
+            x,
+            format: xFormat,
+            hideDomain: true,
+            transitionFix: false,
+            tickValues: x.domain()
+        })
+
+        updateYaxis({
+            chart,
+            y,
+            format: yFormat,
+            hideDomain: true,
+            transitionFix: false,
+        })
+    }
+
+    animateMultipleLines({
+        chart,
+        data,
+        yearField: 'year',
+        x,
+        y,
+        updateAxis,
+        lineAttrs: path => path
+            .attr('stroke', d => colour(d[0]))
+            .attr('stroke-width', 1)
+    })
 
 
 
@@ -168,18 +215,5 @@ getData().then(data => {
     // addLegend('Women')
     // addLegend('Men')
 
-    addAxis({
-        chart,
-        height,
-        width,
-        colour: palette.axis,
-        x,
-        y,
-        xLabel: 'Year',
-        yLabel: 'Number of Athletes',
-        xFormat: d3.utcFormat("%Y"),
-        yFormat: d => d3.format('.1s')(Math.abs(d)),
-        hideXdomain: true,
-        hideYdomain: true,
-    })
+
 })
