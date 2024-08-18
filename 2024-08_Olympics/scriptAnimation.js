@@ -1,7 +1,7 @@
 import { getChart, appendChartContainer, addAxis, getMargin } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
 import { prepareLineData } from "./animation/prepareData.js"
-import { animateSingleLine } from "./animation/line.js"
+import { animateMultipleLines } from "./animation/line.js"
 
 const getData = () =>
     d3.csv('data/dataset.csv')
@@ -23,106 +23,12 @@ const getData = () =>
 
 const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging chart - Animated' })
 
-const lines = (chart, data, prev, next, x, y) => {
-    let line = chart
-        .selectAll('.data-point')
-
-    // const dataPerGroup = d3.group(data, d => d.group)
-    const colour = d3
-        .scaleOrdinal()
-        .range([palette.reddishPurple, palette.blue])
-
-    // const lineGenerator = d3
-    //     .line()
-    //     .x(d => x(d.year))
-    //     .y(d => y(d.value))
-
-    // chart
-    //     .selectAll('.data-point')
-    //     .data(dataPerGroup)
-    //     .join('path')
-    //     .attr('class', 'data-point')
-    //     .attr('fill', 'none')
-    //     .attr('stroke', d => colour(d[0]))
-    //     .attr('stroke-width', 1)
-    //     .attr('d', d => lineGenerator(d[1]))
-
-    return (data, transition) => line = line
-        .data(d3.group(data, d => d.group))
-        .join('path')
-        .attr('class', 'data-point')
-        .attr('fill', 'none')
-        .attr('stroke', d => colour(d[0]))
-        .attr('stroke-width', 1)
-        .call(
-            line => line
-                // .transition(transition)
-                .attr('d', d => d3
-                    .line()
-                    .x(d => x(d.date))
-                    .y(d => y(d.value))
-                    (d[1])
-                )
-        )
-    // .data(data.slice(0, n), d => d.name)
-    // .join(
-    //     enter => enter
-    //         .append('rect')
-    //         .attr('fill', d => colour(rawData, d))
-    //         .attr('height', y.bandwidth())
-    //         .attr('x', x(0))
-    //         .attr('y', d => y(getRank(prev, d)))
-    //         .attr('width', d => x(getValue(prev, d)) - x(0)),
-    //     update => update,
-    //     exit => exit
-    //         .transition(transition)
-    //         .remove()
-    //         .attr('y', d => y(getRank(next, d)))
-    //         .attr('width', d => x(getValue(next, d)) - x(0))
-    // )
-    // .call(
-    //     bar => bar
-    //         .transition(transition)
-    //         .attr('y', d => y(d.rank))
-    //         .attr('width', d => x(d.value) - x(0))
-    // )
-}
-
-const createLineChart = (chart, data, keyframes, prev, next, x, y) => {
-    const updateLines = lines(chart, data, prev, next, x, y)
-    // const updateLabels = labels(svg, prev, next)
-    // const updateImages = images(svg, prev, next)
-    // const updateAxis = axis(svg)
-    // const updateTicker = ticker(svg, keyframes)
-
-    return { updateLines }
-}
-
-const updateLineChart = (lineChartFuncs, keyframe, transition) => {
-    // const { updateBars, updateLabels, updateImages, updateAxis, updateTicker } = lineChartFuncs
-    const { updateLines } = lineChartFuncs
-
-    // Extract the top bar’s value
-    // x.domain([0, keyframe[1][0].value])
-
-    updateLines(keyframe, transition)
-    // updateLabels(keyframe, transition)
-    // updateImages(keyframe, transition)
-    // updateAxis(keyframe, transition)
-    // updateTicker(keyframe, transition)
-}
-
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
-
-    const duration = 0
-    // const length = 100
-
     const { keyframes, prev, next } = prepareLineData(data, undefined, 'year', false)
 
     const x = d3
         .scaleLinear()
-        // .domain(d3.extent(data, d => d.year))
         .domain(d3.extent(keyframes, d => d[0]))
         .range([0, width])
 
@@ -131,28 +37,12 @@ getData().then(data => {
         .domain([0, d3.max(data, d => d.value)].map(d => d * 1.05))
         .range([height, 0])
 
+    const colour = d3
+        .scaleOrdinal()
+        .range([palette.reddishPurple, palette.blue])
 
-    const playChart = async () => {
-        const lineChartFuncs = createLineChart(chart, data, keyframes, prev, next, x, y)
+    animateMultipleLines(chart, keyframes, x, y, colour)
 
-        for (let i = 1; i < keyframes.length; i++) {
-            // console.log(keyframes.slice(0, i));
-            const keyframeData = []
-            keyframes.slice(0, i)
-                .forEach(d => d[1].forEach(v => { keyframeData.push({ date: d[0], group: v.group, value: v.value }) }))
-
-            const transition = chart
-                .transition()
-                .duration(duration)
-                .ease(d3.easeLinear)
-
-            updateLineChart(lineChartFuncs, keyframeData, transition)
-
-            await transition.end()
-        }
-    }
-
-    playChart()
 
 
     // const returnArray = []
