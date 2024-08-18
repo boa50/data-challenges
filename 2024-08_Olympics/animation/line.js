@@ -1,4 +1,4 @@
-import { prepareLineData } from "./prepareData.js"
+import { prepareData } from "./prepareData.js"
 
 export const animateSingleLine = (path, transition) => {
     const pathLength = path.node().getTotalLength()
@@ -21,7 +21,7 @@ export const animateMultipleLines = ({
     updateAxis,
     lineAttrs
 }) => {
-    const { keyframes } = prepareLineData({
+    const { keyframes } = prepareData({
         data,
         dateField,
         yearField,

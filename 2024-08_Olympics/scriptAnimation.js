@@ -56,6 +56,9 @@ getData().then(data => {
         hideYdomain: true,
     })
 
+    const getBeginingYearDate = year =>
+        new Date(year, 0, 1, 0, 0, 0, 0).getTime()
+
     const updateAxis = keyframe => {
         const maxValue = d3.max(keyframe, d => Math.abs(d.value))
         y.domain([-maxValue, maxValue].map(d => d * 1.05))
@@ -66,7 +69,7 @@ getData().then(data => {
             format: xFormat,
             hideDomain: true,
             transitionFix: false,
-            tickValues: x.domain()
+            tickValues: [1900, 1920, 1940, 1960, 1980, 2000, 2020].map(d => getBeginingYearDate(d))
         })
 
         updateYaxis({
