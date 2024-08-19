@@ -127,4 +127,21 @@ getData().then(data => {
             .attr('fill', d => colour(d.key))
     })
 
+
+    // Adding legend directly on the chart
+    const addLegend = txt => {
+        chart
+            .append('text')
+            .attr('x', 16)
+            .attr('y', y(txt === 'Women' ? 150 : -200))
+            .attr('font-size', '2rem')
+            .attr('fill', colour(txt))
+            .attr('font-weight', 500)
+            .attr('dominant-baseline', 'middle')
+            .text(txt)
+    }
+
+    addLegend('Women')
+    addLegend('Men')
+
 })
