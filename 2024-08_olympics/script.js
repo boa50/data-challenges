@@ -64,6 +64,26 @@ getData().then(data => {
     addLegend('Women')
     addLegend('Men')
 
+    // Adding specific points with annotations
+    const rectWidth = 5
+    chart
+        .append('rect')
+        .attr('x', x('1900') - rectWidth / 2)
+        .attr('y', 0)
+        .attr('width', rectWidth)
+        .attr('height', height)
+        .attr('fill', '#a3a3a3')
+        .attr('opacity', 0.5)
+
+    chart
+        .append('text')
+        .attr('x', x('1900') + rectWidth / 2 + 4)
+        .attr('y', 16)
+        .attr('font-size', '0.8rem')
+        .attr('fill', '#525252')
+        .attr('dominant-baseline', 'hanging')
+        .text('Some fact annotation')
+
     addAxis({
         chart,
         height,
