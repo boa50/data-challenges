@@ -59,9 +59,29 @@ getData().then(data => {
     const getBeginingYearDate = year =>
         new Date(year, 0, 1, 0, 0, 0, 0).getTime()
 
+    const getYearFromTime = time =>
+        new Date(time).getFullYear()
+
     const updateAxis = keyframe => {
         const maxValue = d3.max(keyframe, d => Math.abs(d.value))
         y.domain([-maxValue, maxValue].map(d => d * 1.05))
+
+        const xTickYears = [1900, 1920, 1940, 1960, 1980, 2000, 2020]
+        const xTickValues = xTickYears.map(d => getBeginingYearDate(d))
+        const lastYear = getYearFromTime(x.domain()[1])
+        const yearToInclude = lastYear - (lastYear % 4)
+
+        if (lastYear >= 1980 &&
+            !xTickYears.includes(yearToInclude - 4) &&
+            !xTickYears.includes(yearToInclude) &&
+            !xTickYears.includes(yearToInclude + 4)) {
+
+            xTickValues.push(getBeginingYearDate(yearToInclude))
+        } else if (lastYear < 1980 && !xTickYears.includes(yearToInclude)) {
+
+            xTickValues.push(getBeginingYearDate(yearToInclude))
+        }
+
 
         updateXaxis({
             chart,
@@ -69,7 +89,7 @@ getData().then(data => {
             format: xFormat,
             hideDomain: true,
             transitionFix: false,
-            tickValues: [1900, 1920, 1940, 1960, 1980, 2000, 2020].map(d => getBeginingYearDate(d))
+            tickValues: xTickValues
         })
 
         updateYaxis({
