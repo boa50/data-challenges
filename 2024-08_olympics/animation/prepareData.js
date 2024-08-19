@@ -51,5 +51,5 @@ export const prepareData = ({
     const prev = new Map(groupframes.flatMap(([, data]) => d3.pairs(data, (a, b) => [b, a])))
     const next = new Map(groupframes.flatMap(([, data]) => d3.pairs(data)))
 
-    return { keyframes, prev, next }
+    return { keyframes, prev, next, groups }
 }
