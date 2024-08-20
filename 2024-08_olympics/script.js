@@ -1,14 +1,41 @@
 import { getChart, appendChartContainer, addAxis, getMargin, createText } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
+import { plot } from "./charts/dynamic/script.js"
 
 const getData = () =>
-    d3.csv('data/dataset.csv')
-        .then(d => d.map(v => { return { ...v, male: +v.male * -1, female: +v.female } }))
+    Promise.all([
+        d3.csv('data/dataset.csv')
+            .then(d => d.map(v => { return { ...v, male: +v.male * -1, female: +v.female } })),
+        d3.csv('data/dataset.csv')
+            .then(d => {
+                const long_data = []
+                d.forEach(row => {
+                    Object.keys(row).forEach(colname => {
+                        if (colname !== 'year')
+                            long_data.push({
+                                'year': row['year'],
+                                'group': colname,
+                                'value': colname === 'male' ? -row[colname] : +row[colname]
+                            })
+                    })
+                })
+
+                return long_data
+            })
+    ])
 
 const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Olympics Gender Equality' })
+const streamgraphDynamic = appendChartContainer({ idNum: 2, chartTitle: 'Olympics Gender Equality' })
 
-getData().then(data => {
+getData().then(datasets => {
+    const data = datasets[0]
+    const dynamicData = datasets[1]
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
+
+    plot(
+        getChart({ id: streamgraphDynamic, margin: getMargin({ left: 64, bottom: 48, right: 40 }) }),
+        dynamicData
+    )
 
     const x = d3
         .scaleLinear()

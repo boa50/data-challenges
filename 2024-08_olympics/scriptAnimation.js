@@ -1,7 +1,8 @@
 import { getChart, appendChartContainer, addAxis, getMargin, updateXaxis, updateYaxis, createText } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
 import { animateMultipleLines } from "./animation/line.js"
-import { animateArea } from "./animation/area.js"
+import { run } from "./charts/race/script.js"
+import { getBeginingYearDate, getYearFromTime } from "./charts/race/utils.js"
 
 const getData = () =>
     d3.csv('data/dataset.csv')
@@ -21,7 +22,7 @@ const getData = () =>
             return long_data
         })
 
-const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Olympics Gender Equality' })
+const streamgraph = appendChartContainer({ idNum: 3, chartTitle: 'Olympics Gender Equality' })
 
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
@@ -56,12 +57,6 @@ getData().then(data => {
         hideXdomain: true,
         hideYdomain: true,
     })
-
-    const getBeginingYearDate = year =>
-        new Date(year, 0, 1, 0, 0, 0, 0).getTime()
-
-    const getYearFromTime = time =>
-        new Date(time).getFullYear()
 
     const updateAxis = stackedData => {
         // const maxValue = d3.max(keyframe, d => Math.abs(d.value))
@@ -116,67 +111,7 @@ getData().then(data => {
     // })
 
     // Adding specific points with annotations
-    const addAnnotation = ({
-        id = Math.random(),
-        year,
-        txt,
-        position = 'right',
-        fontSize = '0.7rem',
-        marginTop = 4,
-        textWidth = 150,
-        x
-    }) => {
-        const rectWidth = 5
 
-        let xPos, textAnchor
-        switch (position) {
-            case 'right':
-                xPos = rectWidth / 2 + 4
-                textAnchor = 'start'
-                break;
-
-            case 'left':
-                xPos = -rectWidth / 2 - 4 - textWidth
-                textAnchor = 'end'
-                break;
-
-            default:
-                break;
-        }
-
-        const group = chart
-            .append('g')
-            .attr('id', id)
-            .attr('transform', `translate(${[x(year), 0]})`)
-
-        group
-            .append('rect')
-            .attr('x', -rectWidth / 2)
-            .attr('y', 0)
-            .attr('width', rectWidth)
-            .attr('height', height)
-            .attr('fill', '#a3a3a3')
-            .attr('opacity', 0.5)
-
-        createText({
-            svg: group,
-            x: xPos,
-            y: marginTop,
-            width: textWidth,
-            height: 40,
-            textColour: '#525252',
-            fontSize,
-            alignVertical: 'hanging',
-            alignHorizontal: textAnchor,
-            htmlText: txt
-        })
-    }
-
-    const updateAnnotationPosition = (id, x, year) => {
-        chart
-            .select(`#${id}`)
-            .attr('transform', `translate(${[x(year), 0]})`)
-    }
 
 
     const lastYearData = data.filter(d => d.year === '2024')
@@ -230,13 +165,15 @@ getData().then(data => {
                 if (chart.select(`#${id}`).empty()) {
                     addAnnotation({
                         id,
+                        chart,
+                        height,
                         year,
                         txt,
                         x,
                         textWidth
                     })
                 } else {
-                    updateAnnotationPosition(id, x, year)
+                    updateAnnotationPosition(id, chart, x, year)
                 }
             }
         }
@@ -255,14 +192,26 @@ getData().then(data => {
         }
     }
 
-    animateArea({
+    // animateArea({
+    //     chart,
+    //     data,
+    //     yearField: 'year',
+    //     x,
+    //     y,
+    //     updateAxis,
+    //     areaAttrs: path => path
+    //         .attr('fill', d => colour(d.key)),
+    //     addCustom: (data, x, y) => addCustomElements(data, x, y)
+    // })
+
+    run({
         chart,
         data,
         yearField: 'year',
         x,
         y,
         updateAxis,
-        areaAttrs: path => path
+        customAttrs: path => path
             .attr('fill', d => colour(d.key)),
         addCustom: (data, x, y) => addCustomElements(data, x, y)
     })
@@ -285,3 +234,67 @@ getData().then(data => {
     addLegend('Men')
 
 })
+
+function addAnnotation({
+    id = Math.random(),
+    chart,
+    height,
+    year,
+    txt,
+    position = 'right',
+    fontSize = '0.7rem',
+    marginTop = 4,
+    textWidth = 150,
+    x
+}) {
+    const rectWidth = 5
+
+    let xPos, textAnchor
+    switch (position) {
+        case 'right':
+            xPos = rectWidth / 2 + 4
+            textAnchor = 'start'
+            break;
+
+        case 'left':
+            xPos = -rectWidth / 2 - 4 - textWidth
+            textAnchor = 'end'
+            break;
+
+        default:
+            break;
+    }
+
+    const group = chart
+        .append('g')
+        .attr('id', id)
+        .attr('transform', `translate(${[x(year), 0]})`)
+
+    group
+        .append('rect')
+        .attr('x', -rectWidth / 2)
+        .attr('y', 0)
+        .attr('width', rectWidth)
+        .attr('height', height)
+        .attr('fill', '#a3a3a3')
+        .attr('opacity', 0.5)
+
+    createText({
+        svg: group,
+        x: xPos,
+        y: marginTop,
+        width: textWidth,
+        height: 40,
+        textColour: '#525252',
+        fontSize,
+        alignVertical: 'hanging',
+        alignHorizontal: textAnchor,
+        htmlText: txt
+    })
+}
+
+function updateAnnotationPosition(id, chart, x, year) {
+    chart
+        .select(`#${id}`)
+        .attr('transform', `translate(${[x(year), 0]})`)
+}
