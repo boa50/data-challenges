@@ -21,7 +21,7 @@ const getData = () =>
             return long_data
         })
 
-const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging chart - Animated' })
+const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Olympics Gender Equality' })
 
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })

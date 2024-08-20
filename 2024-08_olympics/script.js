@@ -5,7 +5,7 @@ const getData = () =>
     d3.csv('data/dataset.csv')
         .then(d => d.map(v => { return { ...v, male: +v.male * -1, female: +v.female } }))
 
-const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Diverging chart' })
+const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Olympics Gender Equality' })
 
 getData().then(data => {
     const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
