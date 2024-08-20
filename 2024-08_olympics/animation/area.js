@@ -9,7 +9,8 @@ export const animateArea = ({
     x,
     y,
     updateAxis,
-    areaAttrs
+    areaAttrs,
+    addCustom = () => { }
 }) => {
     const { keyframes, groups } = prepareData({
         data,
@@ -22,7 +23,7 @@ export const animateArea = ({
         const updateArea = createAreaChart(chart, x, y, areaAttrs)
 
         for (let i = 1; i < keyframes.length; i++) {
-            // for (let i = 1; i < 20; i++) {
+            // for (let i = 1; i < 160; i++) {
             const keyframeData = []
             keyframes.slice(0, i)
                 .forEach(d => d[1].forEach(v => { keyframeData.push({ date: d[0], group: v.group, value: v.value }) }))
@@ -40,6 +41,8 @@ export const animateArea = ({
                 .ease(d3.easeLinear)
 
             updateAreaChart(updateArea, stackedData, updateAxis, x, y)
+
+            addCustom(keyframeData, x, y)
 
             await transition.end()
         }

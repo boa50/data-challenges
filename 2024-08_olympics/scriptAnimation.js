@@ -1,4 +1,4 @@
-import { getChart, appendChartContainer, addAxis, getMargin, updateXaxis, updateYaxis } from "../node_modules/visual-components/index.js"
+import { getChart, appendChartContainer, addAxis, getMargin, updateXaxis, updateYaxis, createText } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
 import { animateMultipleLines } from "./animation/line.js"
 import { animateArea } from "./animation/area.js"
@@ -24,7 +24,7 @@ const getData = () =>
 const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging chart - Animated' })
 
 getData().then(data => {
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
+    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48 }) })
 
     const x = d3
         .scaleLinear()
@@ -116,6 +116,95 @@ getData().then(data => {
     //         .attr('stroke-width', 1)
     // })
 
+    // Adding specific points with annotations
+    const addAnnotation = ({
+        id = Math.random(),
+        year,
+        txt,
+        position = 'right',
+        fontSize = '0.7rem',
+        marginTop = 4,
+        textWidth = 150,
+        x
+    }) => {
+        const rectWidth = 5
+
+        let xPos, textAnchor
+        switch (position) {
+            case 'right':
+                xPos = rectWidth / 2 + 4
+                textAnchor = 'start'
+                break;
+
+            case 'left':
+                xPos = -rectWidth / 2 - 4 - textWidth
+                textAnchor = 'end'
+                break;
+
+            default:
+                break;
+        }
+
+        const group = chart
+            .append('g')
+            .attr('id', id)
+            .attr('transform', `translate(${[x(year), 0]})`)
+
+        group
+            .append('rect')
+            .attr('x', -rectWidth / 2)
+            .attr('y', 0)
+            .attr('width', rectWidth)
+            .attr('height', height)
+            .attr('fill', '#a3a3a3')
+            .attr('opacity', 0.5)
+
+        createText({
+            svg: group,
+            x: xPos,
+            y: marginTop,
+            width: textWidth,
+            height: 40,
+            textColour: '#525252',
+            fontSize,
+            alignVertical: 'hanging',
+            alignHorizontal: textAnchor,
+            htmlText: txt
+        })
+    }
+
+    const updateAnnotationPosition = (id, x, year) => {
+        chart
+            .select(`#${id}`)
+            .attr('transform', `translate(${[x(year), 0]})`)
+    }
+
+    const customAnnotation = (data, x, y) => {
+        const lastYear = d3.max(data, d => d.date.getFullYear())
+
+        const configureAnnotation = (dt, txt, textWidth) => {
+            if (lastYear >= dt) {
+                const id = `annotation-${dt}`
+                const year = getBeginingYearDate(dt)
+
+                if (chart.select(`#${id}`).empty()) {
+                    addAnnotation({
+                        id,
+                        year,
+                        txt,
+                        x,
+                        textWidth
+                    })
+                } else {
+                    updateAnnotationPosition(id, x, year)
+                }
+            }
+        }
+        configureAnnotation(1996, 'Promoting women becomes a mission of the IOC')
+        configureAnnotation(1964, 'Women represented 13% of the participants', 120)
+        configureAnnotation(1900, 'First modern games featuring female athletes')
+    }
+
     animateArea({
         chart,
         data,
@@ -124,7 +213,8 @@ getData().then(data => {
         y,
         updateAxis,
         areaAttrs: path => path
-            .attr('fill', d => colour(d.key))
+            .attr('fill', d => colour(d.key)),
+        addCustom: (data, x, y) => customAnnotation(data, x, y)
     })
 
 
@@ -132,8 +222,8 @@ getData().then(data => {
     const addLegend = txt => {
         chart
             .append('text')
-            .attr('x', 16)
-            .attr('y', y(txt === 'Women' ? 150 : -200))
+            .attr('x', 32)
+            .attr('y', y(txt === 'Women' ? 100 : -150))
             .attr('font-size', '2rem')
             .attr('fill', colour(txt))
             .attr('font-weight', 500)
