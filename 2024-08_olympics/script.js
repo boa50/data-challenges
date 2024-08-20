@@ -8,7 +8,7 @@ const getData = () =>
 const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Diverging chart' })
 
 getData().then(data => {
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48 }) })
+    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
 
     const x = d3
         .scaleLinear()
@@ -126,6 +126,38 @@ getData().then(data => {
         year: '1996',
         txt: 'Promoting women becomes a mission of the IOC'
     })
+
+
+    // Adding end point data
+    const addDataPoint = group => {
+        const lastYearData = data.filter(d => d.year === '2024')[0]
+        const g = chart
+            .append('g')
+            .attr('id', `data-point-${group}`)
+            .attr('transform', `translate(${[x('2024'), y(lastYearData[group])]})`)
+
+        g
+            .append('circle')
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', 3)
+            .attr('fill', '#525252')
+            .attr('stroke', '#FFFFFF')
+            .attr('stroke-width', 1)
+
+        const percentValue = Math.abs(lastYearData[group]) / (lastYearData.female + Math.abs(lastYearData.male))
+
+        g
+            .append('text')
+            .attr('x', 4)
+            .attr('y', 0)
+            .attr('fill', '#525252')
+            .attr('dominant-baseline', 'middle')
+            .attr('font-size', '0.7rem')
+            .text(`${d3.format('.1%')(percentValue)}`)
+    }
+    addDataPoint('female')
+    addDataPoint('male')
 
     addAxis({
         chart,
