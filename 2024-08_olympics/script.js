@@ -1,4 +1,4 @@
-import { getChart, appendChartContainer, addAxis, getMargin } from "../node_modules/visual-components/index.js"
+import { getChart, appendChartContainer, addAxis, getMargin, createText } from "../node_modules/visual-components/index.js"
 import { palette } from "../colours.js"
 
 const getData = () =>
@@ -8,7 +8,7 @@ const getData = () =>
 const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Diverging chart' })
 
 getData().then(data => {
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64 }) })
+    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48 }) })
 
     const x = d3
         .scaleLinear()
@@ -65,24 +65,67 @@ getData().then(data => {
     addLegend('Men')
 
     // Adding specific points with annotations
-    const rectWidth = 5
-    chart
-        .append('rect')
-        .attr('x', x('1900') - rectWidth / 2)
-        .attr('y', 0)
-        .attr('width', rectWidth)
-        .attr('height', height)
-        .attr('fill', '#a3a3a3')
-        .attr('opacity', 0.5)
+    const addAnnotation = ({
+        year,
+        txt,
+        position = 'right',
+        fontSize = '0.7rem',
+        marginTop = 4,
+        textWidth = 150
+    }) => {
+        const rectWidth = 5
 
-    chart
-        .append('text')
-        .attr('x', x('1900') + rectWidth / 2 + 4)
-        .attr('y', 16)
-        .attr('font-size', '0.8rem')
-        .attr('fill', '#525252')
-        .attr('dominant-baseline', 'hanging')
-        .text('Some fact annotation')
+        let xPos, textAnchor
+        switch (position) {
+            case 'right':
+                xPos = x(year) + rectWidth / 2 + 4
+                textAnchor = 'start'
+                break;
+
+            case 'left':
+                xPos = x(year) - rectWidth / 2 - 4 - textWidth
+                textAnchor = 'end'
+                break;
+
+            default:
+                break;
+        }
+
+        chart
+            .append('rect')
+            .attr('x', x(year) - rectWidth / 2)
+            .attr('y', 0)
+            .attr('width', rectWidth)
+            .attr('height', height)
+            .attr('fill', '#a3a3a3')
+            .attr('opacity', 0.5)
+
+        createText({
+            svg: chart,
+            x: xPos,
+            y: marginTop,
+            width: textWidth,
+            height: 40,
+            textColour: '#525252',
+            fontSize,
+            alignVertical: 'hanging',
+            alignHorizontal: textAnchor,
+            htmlText: txt
+        })
+    }
+    addAnnotation({
+        year: '1900',
+        txt: 'First modern games featuring female athletes'
+    })
+    addAnnotation({
+        year: '1964',
+        txt: 'Women represented 13% of the participants',
+        textWidth: 120
+    })
+    addAnnotation({
+        year: '1996',
+        txt: 'Promoting women becomes a mission of the IOC'
+    })
 
     addAxis({
         chart,
