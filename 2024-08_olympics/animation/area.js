@@ -23,7 +23,6 @@ export const animateArea = ({
         const updateArea = createAreaChart(chart, x, y, areaAttrs)
 
         for (let i = 1; i < keyframes.length; i++) {
-            // for (let i = 1; i < 160; i++) {
             const keyframeData = []
             keyframes.slice(0, i)
                 .forEach(d => d[1].forEach(v => { keyframeData.push({ date: d[0], group: v.group, value: v.value }) }))

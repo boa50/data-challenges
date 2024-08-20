@@ -24,7 +24,7 @@ const getData = () =>
 const streamgraph = appendChartContainer({ idNum: 2, chartTitle: 'Diverging chart - Animated' })
 
 getData().then(data => {
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48 }) })
+    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
 
     const x = d3
         .scaleLinear()
@@ -84,7 +84,6 @@ getData().then(data => {
 
             xTickValues.push(getBeginingYearDate(yearToInclude))
         }
-
 
         updateXaxis({
             chart,
@@ -179,7 +178,48 @@ getData().then(data => {
             .attr('transform', `translate(${[x(year), 0]})`)
     }
 
-    const customAnnotation = (data, x, y) => {
+
+    const lastYearData = data.filter(d => d.year === '2024')
+    const lastYearValues = {
+        female: lastYearData.filter(d => d.group === 'female')[0].value,
+        male: lastYearData.filter(d => d.group === 'male')[0].value
+    }
+
+    // Adding end point data
+    const addDataPoint = (group, x, y) => {
+        const g = chart
+            .append('g')
+            .attr('id', `data-point-${group}`)
+            .attr('transform', `translate(${[x(getBeginingYearDate(2024)), y(lastYearValues[group])]})`)
+
+        g
+            .append('circle')
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', 3)
+            .attr('fill', '#525252')
+            .attr('stroke', '#FFFFFF')
+            .attr('stroke-width', 1)
+
+        const percentValue = Math.abs(lastYearValues[group]) / (lastYearValues.female + Math.abs(lastYearValues.male))
+
+        g
+            .append('text')
+            .attr('x', 4)
+            .attr('y', 0)
+            .attr('fill', '#525252')
+            .attr('dominant-baseline', 'middle')
+            .attr('font-size', '0.7rem')
+            .text(`${d3.format('.1%')(percentValue)}`)
+    }
+
+    const updateDataPointPosition = (group, x, y) => {
+        chart
+            .select(`#data-point-${group}`)
+            .attr('transform', `translate(${[x(getBeginingYearDate(2024)), y(lastYearValues[group])]})`)
+    }
+
+    const addCustomElements = (data, x, y) => {
         const lastYear = d3.max(data, d => d.date.getFullYear())
 
         const configureAnnotation = (dt, txt, textWidth) => {
@@ -203,6 +243,16 @@ getData().then(data => {
         configureAnnotation(1996, 'Promoting women becomes a mission of the IOC')
         configureAnnotation(1964, 'Women represented 13% of the participants', 120)
         configureAnnotation(1900, 'First modern games featuring female athletes')
+
+        if (lastYear >= 2016) {
+            if (chart.select('#data-point-female').empty()) {
+                addDataPoint('female', x, y)
+                addDataPoint('male', x, y)
+            } else {
+                updateDataPointPosition('female', x, y)
+                updateDataPointPosition('male', x, y)
+            }
+        }
     }
 
     animateArea({
@@ -214,7 +264,7 @@ getData().then(data => {
         updateAxis,
         areaAttrs: path => path
             .attr('fill', d => colour(d.key)),
-        addCustom: (data, x, y) => customAnnotation(data, x, y)
+        addCustom: (data, x, y) => addCustomElements(data, x, y)
     })
 
 
