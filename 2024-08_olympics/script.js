@@ -141,7 +141,7 @@ getData().then(data => {
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('r', 3)
-            .attr('fill', '#525252')
+            .attr('fill', colour(group))
             .attr('stroke', '#FFFFFF')
             .attr('stroke-width', 1)
 
@@ -151,7 +151,7 @@ getData().then(data => {
             .append('text')
             .attr('x', 4)
             .attr('y', 0)
-            .attr('fill', '#525252')
+            .attr('fill', colour(group))
             .attr('dominant-baseline', 'middle')
             .attr('font-size', '0.7rem')
             .text(`${d3.format('.1%')(percentValue)}`)
