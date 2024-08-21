@@ -45,6 +45,17 @@ export const plot = (chartProps, data, theme) => {
         .style('fill', d => colour(d.key))
         .attr('d', area)
 
+    // Adding a divisor line
+    const lineWidth = 1
+    chart
+        .append('line')
+        .attr('x1', 0)
+        .attr('x2', width)
+        .attr('y1', height / 2 + (lineWidth / 2))
+        .attr('y2', height / 2 + (lineWidth / 2))
+        .attr('stroke', '#030712')
+        .attr('stroke-width', lineWidth)
+
     addAxis({
         chart,
         height,

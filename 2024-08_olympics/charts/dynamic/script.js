@@ -59,16 +59,17 @@ export const plot = (chartProps, data, theme) => {
         updateAxis: stackedData => updateAxis(stackedData, chart, x, y, xFormat, yFormat),
         customAttrs: path => path
             .attr('fill', d => colour(d.key)),
-        addCustom: (data, x, y) => addCustomElements({ data, x, y, chart, height, lastYearValues, colour })
+        addCustom: (data, x, y) => addCustomElements({ data, x, y, chart, height, width, lastYearValues, colour })
     })
 
     addLegend(chart, y, 'Women', colour)
     addLegend(chart, y, 'Men', colour)
 }
 
-function addCustomElements({ data, x, y, chart, height, lastYearValues, colour }) {
+function addCustomElements({ data, x, y, chart, height, width, lastYearValues, colour }) {
     const lastYear = d3.max(data, d => d.date.getFullYear())
 
+    // Adding specific points with annotations
     const configureAnnotation = (dt, txt, textWidth) => {
         if (lastYear >= dt) {
             const id = `annotation-${dt}`
@@ -93,6 +94,7 @@ function addCustomElements({ data, x, y, chart, height, lastYearValues, colour }
     configureAnnotation(1964, 'Women represented 13% of the participants', 120)
     configureAnnotation(1900, 'First modern games featuring female athletes')
 
+    // Adding end point data
     if (lastYear >= 2016) {
         if (chart.select('#data-point-female').empty()) {
             addDataPoint(chart, 'female', x, y, lastYearValues, colour)
@@ -101,6 +103,20 @@ function addCustomElements({ data, x, y, chart, height, lastYearValues, colour }
             updateDataPointPosition(chart, 'female', x, y, lastYearValues)
             updateDataPointPosition(chart, 'male', x, y, lastYearValues)
         }
+    }
+
+    // Adding a divisor line
+    if (chart.select('#divisor-line').empty()) {
+        const lineWidth = 1
+        chart
+            .append('line')
+            .attr('id', 'divisor-line')
+            .attr('x1', 0)
+            .attr('x2', width)
+            .attr('y1', height / 2 + (lineWidth / 2))
+            .attr('y2', height / 2 + (lineWidth / 2))
+            .attr('stroke', '#030712')
+            .attr('stroke-width', lineWidth)
     }
 }
 
