@@ -1,6 +1,6 @@
-import { getChart, appendChartContainer, addAxis, getMargin, createText } from "../node_modules/visual-components/index.js"
-import { palette } from "../colours.js"
-import { plot } from "./charts/dynamic/script.js"
+import { getChart, appendChartContainer, getMargin } from "../node_modules/visual-components/index.js"
+import { plot as plotStatic } from "./charts/static/script.js"
+import { plot as plotDynamic } from "./charts/dynamic/script.js"
 
 const getData = () =>
     Promise.all([
@@ -30,174 +30,15 @@ const streamgraphDynamic = appendChartContainer({ idNum: 2, chartTitle: 'Olympic
 getData().then(datasets => {
     const data = datasets[0]
     const dynamicData = datasets[1]
-    const { chart, width, height } = getChart({ id: streamgraph, margin: getMargin({ left: 64, bottom: 48, right: 40 }) })
+    const chartMargin = getMargin({ left: 64, bottom: 48, right: 40 })
 
-    plot(
-        getChart({ id: streamgraphDynamic, margin: getMargin({ left: 64, bottom: 48, right: 40 }) }),
-        dynamicData
+    plotStatic(
+        getChart({ id: streamgraph, margin: chartMargin }),
+        data
     )
 
-    const x = d3
-        .scaleLinear()
-        .domain(d3.extent(data, d => d.year))
-        .range([0, width])
-
-    const y = d3
-        .scaleLinear()
-        .domain([d3.min(data, d => d.male), -d3.min(data, d => d.male)].map(d => d * 1.05))
-        .range([height, 0])
-
-    const keys = Object.keys(data[0]).slice(1)
-
-    const colour = d3
-        .scaleOrdinal()
-        .domain(keys)
-        .range([palette.reddishPurple, palette.blue])
-
-    const stackedData = d3
-        .stack()
-        .offset(d3.stackOffsetDiverging)
-        .keys(keys)
-        (data)
-
-    const area = d3
-        .area()
-        .x(d => x(d.data.year))
-        .y0(d => y(d[0]))
-        .y1(d => y(d[1]))
-
-
-    chart
-        .selectAll('data-points')
-        .data(stackedData)
-        .join('path')
-        .style('fill', d => colour(d.key))
-        .attr('d', area)
-
-    // Adding legend directly on the chart
-    const addLegend = txt => {
-        chart
-            .append('text')
-            .attr('x', x('2000'))
-            .attr('y', y(txt === 'Women' ? 800 : -1000))
-            .attr('font-size', '2rem')
-            .attr('fill', '#FFFFFF')
-            .attr('font-weight', 500)
-            .attr('dominant-baseline', 'middle')
-            .attr('opacity', 0.85)
-            .text(txt)
-    }
-
-    addLegend('Women')
-    addLegend('Men')
-
-    // Adding specific points with annotations
-    const addAnnotation = ({
-        year,
-        txt,
-        position = 'right',
-        fontSize = '0.7rem',
-        marginTop = 4,
-        textWidth = 150
-    }) => {
-        const rectWidth = 5
-
-        let xPos, textAnchor
-        switch (position) {
-            case 'right':
-                xPos = x(year) + rectWidth / 2 + 4
-                textAnchor = 'start'
-                break;
-
-            case 'left':
-                xPos = x(year) - rectWidth / 2 - 4 - textWidth
-                textAnchor = 'end'
-                break;
-
-            default:
-                break;
-        }
-
-        chart
-            .append('rect')
-            .attr('x', x(year) - rectWidth / 2)
-            .attr('y', 0)
-            .attr('width', rectWidth)
-            .attr('height', height)
-            .attr('fill', '#a3a3a3')
-            .attr('opacity', 0.5)
-
-        createText({
-            svg: chart,
-            x: xPos,
-            y: marginTop,
-            width: textWidth,
-            height: 40,
-            textColour: '#525252',
-            fontSize,
-            alignVertical: 'hanging',
-            alignHorizontal: textAnchor,
-            htmlText: txt
-        })
-    }
-    addAnnotation({
-        year: '1900',
-        txt: 'First modern games featuring female athletes'
-    })
-    addAnnotation({
-        year: '1964',
-        txt: 'Women represented 13% of the participants',
-        textWidth: 120
-    })
-    addAnnotation({
-        year: '1996',
-        txt: 'Promoting women becomes a mission of the IOC'
-    })
-
-
-    // Adding end point data
-    const addDataPoint = group => {
-        const lastYearData = data.filter(d => d.year === '2024')[0]
-        const g = chart
-            .append('g')
-            .attr('id', `data-point-${group}`)
-            .attr('transform', `translate(${[x('2024'), y(lastYearData[group])]})`)
-
-        g
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 3)
-            .attr('fill', colour(group))
-            .attr('stroke', '#FFFFFF')
-            .attr('stroke-width', 1)
-
-        const percentValue = Math.abs(lastYearData[group]) / (lastYearData.female + Math.abs(lastYearData.male))
-
-        g
-            .append('text')
-            .attr('x', 4)
-            .attr('y', 0)
-            .attr('fill', colour(group))
-            .attr('dominant-baseline', 'middle')
-            .attr('font-size', '0.7rem')
-            .text(`${d3.format('.1%')(percentValue)}`)
-    }
-    addDataPoint('female')
-    addDataPoint('male')
-
-    addAxis({
-        chart,
-        height,
-        width,
-        colour: palette.axis,
-        x,
-        y,
-        xLabel: 'Year',
-        yLabel: 'Number of Athletes',
-        xFormat: d => d,
-        yFormat: d => d3.format('.1s')(Math.abs(d)),
-        hideXdomain: true,
-        hideYdomain: true,
-    })
+    plotDynamic(
+        getChart({ id: streamgraphDynamic, margin: chartMargin }),
+        dynamicData
+    )
 })
