@@ -1,7 +1,5 @@
-import { addAxis } from "../../../node_modules/visual-components/index.js"
+import { addAxis, getBeginingYearDate, runRaceChart } from "../../../node_modules/visual-components/index.js"
 import { palette as paletteLightBg, paletteDarkBg } from "../../../colours.js"
-import { run } from "../race/script.js"
-import { getBeginingYearDate } from "../race/utils.js"
 import { updateAxis } from "./axis.js"
 import { addAnnotation, updateAnnotationPosition, addDataPoint, updateDataPointPosition } from "./annotation.js"
 
@@ -50,7 +48,7 @@ export const plot = (chartProps, data, theme) => {
         hideYdomain: true,
     })
 
-    run({
+    runRaceChart({
         chart,
         data,
         yearField: 'year',

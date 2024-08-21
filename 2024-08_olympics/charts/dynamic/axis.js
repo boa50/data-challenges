@@ -1,5 +1,4 @@
-import { updateXaxis, updateYaxis } from "../../../node_modules/visual-components/index.js"
-import { getBeginingYearDate, getYearFromTime } from "../race/utils.js"
+import { updateXaxis, updateYaxis, getBeginingYearDate, getYearFromTime } from "../../../node_modules/visual-components/index.js"
 
 export const updateAxis = (stackedData, chart, x, y, xFormat, yFormat) => {
     const maxValue = d3.max(d3.union(...stackedData.map(d => d.map(v => d3.max(v, v2 => Math.abs(v2))))), d => d)

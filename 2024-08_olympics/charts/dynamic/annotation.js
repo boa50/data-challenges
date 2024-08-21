@@ -1,5 +1,4 @@
-import { createText } from "../../../node_modules/visual-components/index.js"
-import { getBeginingYearDate } from "../race/utils.js"
+import { createText, getBeginingYearDate } from "../../../node_modules/visual-components/index.js"
 
 export const addAnnotation = ({
     id = Math.random(),
