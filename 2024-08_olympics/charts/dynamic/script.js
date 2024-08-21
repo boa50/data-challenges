@@ -1,12 +1,12 @@
 import { addAxis } from "../../../node_modules/visual-components/index.js"
-import { palette } from "../../../colours.js"
+import { palette as paletteLightBg, paletteDarkBg } from "../../../colours.js"
 import { run } from "../race/script.js"
 import { getBeginingYearDate } from "../race/utils.js"
 import { updateAxis } from "./axis.js"
 import { addAnnotation, updateAnnotationPosition, addDataPoint, updateDataPointPosition } from "./annotation.js"
 
 
-export const plot = (chartProps, data) => {
+export const plot = (chartProps, data, theme) => {
     const { chart, width, height } = chartProps
 
     const lastYearData = data.filter(d => d.year === '2024')
@@ -14,6 +14,9 @@ export const plot = (chartProps, data) => {
         female: lastYearData.filter(d => d.group === 'female')[0].value,
         male: lastYearData.filter(d => d.group === 'male')[0].value
     }
+
+    let palette = paletteLightBg
+    if (theme === 'dark') palette = paletteDarkBg
 
     const x = d3
         .scaleLinear()
@@ -36,6 +39,7 @@ export const plot = (chartProps, data) => {
         height,
         width,
         colour: palette.axis,
+        fontSize: '0.7rem',
         x,
         y,
         xLabel: 'Year',

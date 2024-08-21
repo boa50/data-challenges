@@ -42,8 +42,10 @@ export const addAnnotation = ({
         .attr('y', 0)
         .attr('width', rectWidth)
         .attr('height', height)
-        .attr('fill', '#a3a3a3')
-        .attr('opacity', 0.5)
+        // .attr('fill', '#a3a3a3')
+        .attr('fill', '#525252')
+        // .attr('opacity', 0.5)
+        .attr('opacity', 0.75)
 
     createText({
         svg: group,
@@ -51,7 +53,8 @@ export const addAnnotation = ({
         y: marginTop,
         width: textWidth,
         height: 40,
-        textColour: '#525252',
+        // textColour: '#525252',
+        textColour: '#d4d4d4',
         fontSize,
         alignVertical: 'hanging',
         alignHorizontal: textAnchor,

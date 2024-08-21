@@ -24,8 +24,9 @@ const getData = () =>
             })
     ])
 
-const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Olympics Gender Equality' })
-const streamgraphDynamic = appendChartContainer({ idNum: 2, chartTitle: 'Olympics Gender Equality' })
+const titleClass = 'text-sm md:text-2xl text-neutral-200 font-medium'
+const streamgraph = appendChartContainer({ idNum: 1, chartTitle: 'Olympics Gender Equality', theme: 'darkGradient', titleClass })
+const streamgraphDynamic = appendChartContainer({ idNum: 2, chartTitle: 'Olympics Gender Equality', theme: 'darkGradient', titleClass })
 
 getData().then(datasets => {
     const data = datasets[0]
@@ -34,11 +35,13 @@ getData().then(datasets => {
 
     plotStatic(
         getChart({ id: streamgraph, margin: chartMargin }),
-        data
+        data,
+        'dark'
     )
 
     plotDynamic(
         getChart({ id: streamgraphDynamic, margin: chartMargin }),
-        dynamicData
+        dynamicData,
+        'dark'
     )
 })

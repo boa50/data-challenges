@@ -1,11 +1,13 @@
 import { addAxis } from "../../../node_modules/visual-components/index.js"
-import { palette } from "../../../colours.js"
+import { palette as paletteLightBg, paletteDarkBg } from "../../../colours.js"
 import { addAnnotation, addDataPoint } from "./annotation.js"
 
-export const plot = (chartProps, data) => {
+export const plot = (chartProps, data, theme) => {
     const { chart, width, height } = chartProps
-
     const lastYearData = data.filter(d => d.year === '2024')[0]
+
+    let palette = paletteLightBg
+    if (theme === 'dark') palette = paletteDarkBg
 
     const x = d3
         .scaleLinear()
@@ -48,6 +50,7 @@ export const plot = (chartProps, data) => {
         height,
         width,
         colour: palette.axis,
+        fontSize: '0.7rem',
         x,
         y,
         xLabel: 'Year',
@@ -88,12 +91,12 @@ export const plot = (chartProps, data) => {
 function addLegend(chart, x, y, txt) {
     chart
         .append('text')
-        .attr('x', x('2000'))
+        .attr('x', x('1998'))
         .attr('y', y(txt === 'Women' ? 800 : -1000))
         .attr('font-size', '2rem')
-        .attr('fill', '#FFFFFF')
+        .attr('fill', '#171717')
         .attr('font-weight', 500)
         .attr('dominant-baseline', 'middle')
-        .attr('opacity', 0.85)
+        .attr('opacity', 0.45)
         .text(txt)
 }
