@@ -49,6 +49,7 @@ export const plot = (chartProps, data, theme) => {
     })
 
     runRaceChart({
+        type: 'area',
         chart,
         data,
         yearField: 'year',
