@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>PAGE TITLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../lib/tailwind_3_4_3.min.js"></script>
+</head>
+
+<body class="bg-gray-300 font-sans">
+    <!-- HEADER -->
+    <div id="header" class="flex flex-row p-4 mb-4 bg-slate-50">
+        <div class="flex flex-row self-center items-center">
+            <!-- PAGE LOGO -->
+            <!-- <img src="./img/logo.svg" alt="dashboard logo" class="max-h-8 md:max-h-10 mx-2 md:mx-4" /> -->
+            <h1 id="title" class="text-2xl md:text-3xl text-gray-600 self-center font-medium">PAGE TITLE</h1>
+        </div>
+
+        <div class="flex-auto"></div>
+
+        <!-- RIGHT SIDE HEADER -->
+        <div id="controls" class="flex flex-row space-x-8 mr-8">
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="mx-2 md:mx-8">
+        <div id="charts" class="grid lg:grid-cols-2 gap-4"></div>
+
+        <!-- CAPTION -->
+        <div id="caption" class="leading-none flex justify-end m-2">
+            <span class="text-sm text-gray-500">Source: </span>
+        </div>
+    </div>
+
+    <script src="../lib/d3_7_9_0.min.js"></script>
+    <script type="module" src="./script.js"></script>
+</body>
