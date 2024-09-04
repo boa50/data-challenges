@@ -10,7 +10,7 @@ export const addChart = async (chartProps, theme = 'light') => {
     const colour = d3
         .scaleOrdinal()
         .domain(subgroups)
-        .range([palette.vermillion, palette.bluishGreen, palette.amber, d3.hsl(palette.axis).brighter(1.5)])
+        .range([palette.vermillion, palette.bluishGreen, d3.hsl(palette.amber).darker(0.5), d3.hsl(palette.axis).brighter(1.5)])
 
     const { x, y } = prepareAxis(data, width, height)
     plotGraph(chart, data, subgroups, x, y, colour, width, height, margin, palette)
