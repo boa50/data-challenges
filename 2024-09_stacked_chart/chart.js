@@ -1,6 +1,8 @@
 import { addAxis, colours } from '../node_modules/visual-components/index.js'
+import { convertNumber, formatFoodName } from './utils.js'
+import { addLabels } from './labels.js'
 
-const animalBasedFoods = ['Beef (beef herd)', 'Lamb & Mutton', 'Cheese', //'Shrimps (farmed)',
+const animalBasedFoods = ['Beef (beef herd)', 'Lamb & Mutton', 'Cheese',
     'Fish (farmed)', 'Pig Meat', 'Poultry Meat', 'Eggs', 'Milk',]
 const plantBasedFoods = ['Dark Chocolate', 'Coffee', 'Palm Oil', 'Rice', 'Nuts', 'Tofu',
     'Oatmeal', 'Soy milk']
@@ -59,13 +61,11 @@ export const addChart = async (chartProps, theme = 'light') => {
     chart
         .append('g')
         .selectAll('g')
-        // Enter in the stack data = loop key per key = group per group
         .data(stackedData)
         .join('g')
         .attr('fill', d => colour(d.key))
         .attr('stroke', 'white')
         .selectAll('rect')
-        // enter a second time = loop subgroup per subgroup to add all rectangles
         .data(d => d)
         .join('rect')
         .attr('y', d => y(d.data.food))
@@ -82,29 +82,7 @@ export const addChart = async (chartProps, theme = 'light') => {
         .attr('stroke', d3.hsl(palette.axis).brighter(2))
         .attr('stroke-dasharray', '4 2')
 
-    chart
-        .append('text')
-        .attr('x', width / 1.05)
-        .attr('y', height / 2 - 32)
-        .attr('dominant-baseline', 'auto')
-        .attr('text-anchor', 'end')
-        .attr('font-size', '2rem')
-        .attr('font-weight', 500)
-        .attr('fill', palette.vermillion)
-        .attr('opacity', 0.5)
-        .text('Animal Based')
-
-    chart
-        .append('text')
-        .attr('x', width / 1.05)
-        .attr('y', height / 2 + 32)
-        .attr('dominant-baseline', 'hanging')
-        .attr('text-anchor', 'end')
-        .attr('font-size', '2rem')
-        .attr('font-weight', 500)
-        .attr('fill', palette.bluishGreen)
-        .attr('opacity', 0.5)
-        .text('Plant Based')
+    addLabels(chart, width, height, palette)
 
     addAxis({
         chart,
@@ -118,39 +96,5 @@ export const addChart = async (chartProps, theme = 'light') => {
         hideXdomain: true,
         hideYdomain: true
     })
-
-    // chart
-    //     .selectAll('.myRect')
-    //     .data(data)
-    //     .join('rect')
-    //     .attr('x', x(0))
-    //     .attr('y', d => y(d.GROUP_FIELD))
-    //     .attr('width', d => x(d.VALUE))
-    //     .attr('height', y.bandwidth())
-    //     .attr('fill', '#69b3a2')
 }
 
-function convertNumber(number) {
-    return +number > 0 ? +number : 0
-}
-
-function formatFoodName(food) {
-    switch (food) {
-        case 'Beef (beef herd)':
-            return 'Beef'
-        case 'Lamb & Mutton':
-            return 'Lamb'
-        case 'Shrimps (farmed)':
-            return 'Shrimp'
-        case 'Fish (farmed)':
-            return 'Fish'
-        case 'Pig Meat':
-            return 'Pig'
-        case 'Poultry Meat':
-            return 'Poultry'
-        case 'Dark Chocolate':
-            return 'Chocolate'
-        default:
-            return food
-    }
-}
