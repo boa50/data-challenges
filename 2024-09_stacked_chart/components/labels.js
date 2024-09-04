@@ -1,32 +1,32 @@
-import { convertSizeToIntPx } from "../node_modules/visual-components/index.js"
+import { convertSizeToIntPx } from "../../node_modules/visual-components/index.js"
 
 export const addLabels = (chart, width, height, palette) => {
-    addLabel(chart, width, height, palette.vermillion, 'top', getImgPath('animal'), 'Animal Based')
-    addLabel(chart, width, height, palette.bluishGreen, 'bottom', getImgPath('plant'), 'Plant Based')
+	addLabel(chart, width, height, palette.vermillion, 'top', getImgPath('animal'), 'Animal Based')
+	addLabel(chart, width, height, palette.bluishGreen, 'bottom', getImgPath('plant'), 'Plant Based')
 }
 
 function addLabel(chart, width, height, colour, position, imgPath, text) {
-    const x = width / 1.1
-    const y = position === 'top' ? height / 2 - 32 : height / 2 + 32
-    const imageY = position === 'top' ? y - convertSizeToIntPx('2rem') + 4 : y - 4
+	const x = width / 1.1
+	const y = position === 'top' ? height / 2 - 32 : height / 2 + 32
+	const imageY = position === 'top' ? y - convertSizeToIntPx('2rem') + 4 : y - 4
 
-    chart
-        .append('text')
-        .attr('x', x)
-        .attr('y', y)
-        .attr('dominant-baseline', position === 'top' ? 'auto' : 'hanging')
-        .attr('text-anchor', 'end')
-        .attr('font-size', '2rem')
-        .attr('font-weight', 500)
-        .attr('fill', colour)
-        .attr('opacity', 0.5)
-        .text(text)
+	chart
+		.append('text')
+		.attr('x', x)
+		.attr('y', y)
+		.attr('dominant-baseline', position === 'top' ? 'auto' : 'hanging')
+		.attr('text-anchor', 'end')
+		.attr('font-size', '2rem')
+		.attr('font-weight', 500)
+		.attr('fill', colour)
+		.attr('opacity', 0.5)
+		.text(text)
 
-    chart
-        .append('path')
-        .attr('transform', `translate(${[x + 4, imageY]}) scale(0.06)`)
-        .attr('fill', colour)
-        .attr('d', imgPath)
+	chart
+		.append('path')
+		.attr('transform', `translate(${[x + 4, imageY]}) scale(0.06)`)
+		.attr('fill', colour)
+		.attr('d', imgPath)
 }
 
 
@@ -35,11 +35,11 @@ function addLabel(chart, width, height, colour, position, imgPath, text) {
  * https://www.svgrepo.com/svg/481098/cow-7
 */
 function getImgPath(type) {
-    switch (type) {
-        case 'plant':
-            return 'M431.58,32.35a5.93,5.93,0,0,0-6.53-2.24C248.25,82.58,138,157.69,97.48,253.36c-33.9,80-6.33,145.74-.61,157.86-14.52,39.23-17.47,63.67-17.54,64.32a6,6,0,0,0,5.3,6.57l.63,0a6,6,0,0,0,5.93-5.33c.07-.62,2.88-23.4,16.33-60.17,9.37.62,18.63,1.09,27.57,1.09C265.81,417.73,349,352,365.16,234.05,382,111.18,431.13,40,431.62,39.26A6,6,0,0,0,431.58,32.35ZM353.36,232.44C330.81,396.69,183.25,409.08,111.93,405.1c26.47-66.66,85.64-171,216.14-274.67a6,6,0,0,0-7.42-9.35C192.08,223.25,131.48,326.46,103.24,395a190.72,190.72,0,0,1,5.22-137C146.41,168.49,249,97.25,413.31,46.13,398,72.66,366.49,136.72,353.36,232.44Z'
-        case 'animal':
-            return `M512,237.3c-0.008-14.331-1.105-28.117-4.601-40.405c-1.748-6.136-4.102-11.914-7.285-17.14
+	switch (type) {
+		case 'plant':
+			return 'M431.58,32.35a5.93,5.93,0,0,0-6.53-2.24C248.25,82.58,138,157.69,97.48,253.36c-33.9,80-6.33,145.74-.61,157.86-14.52,39.23-17.47,63.67-17.54,64.32a6,6,0,0,0,5.3,6.57l.63,0a6,6,0,0,0,5.93-5.33c.07-.62,2.88-23.4,16.33-60.17,9.37.62,18.63,1.09,27.57,1.09C265.81,417.73,349,352,365.16,234.05,382,111.18,431.13,40,431.62,39.26A6,6,0,0,0,431.58,32.35ZM353.36,232.44C330.81,396.69,183.25,409.08,111.93,405.1c26.47-66.66,85.64-171,216.14-274.67a6,6,0,0,0-7.42-9.35C192.08,223.25,131.48,326.46,103.24,395a190.72,190.72,0,0,1,5.22-137C146.41,168.49,249,97.25,413.31,46.13,398,72.66,366.49,136.72,353.36,232.44Z'
+		case 'animal':
+			return `M512,237.3c-0.008-14.331-1.105-28.117-4.601-40.405c-1.748-6.136-4.102-11.914-7.285-17.14
 		c-3.166-5.226-7.17-9.899-12.101-13.733l-0.054-0.036l0,0c-9.399-7.161-18.112-11.896-27.287-14.732
 		c-9.176-2.836-18.647-3.754-29.544-3.754c-12.324,0-26.583,1.15-45.006,2.229c-16.454,0.973-38.747,1.142-59.132,1.142
 		c-10.853,0-21.171-0.045-29.829-0.045c-11.931,0.009-31.631-1.748-51.704-4.548c-20.065-2.782-40.664-6.635-54.504-10.647
@@ -113,7 +113,7 @@ function getImgPath(type) {
 		c3.79,6.234,6.376,13.921,7.972,22.677c1.605,8.757,2.221,18.54,2.221,28.831c0,14.276-1.186,29.517-2.372,44.427
 		c-1.194,14.919-2.407,29.508-2.416,42.644c0.009,7.651,0.419,14.812,1.552,21.34c-0.009,0.179-0.045,0.731-0.133,1.472
 		C496.609,350.391,495.423,356.83,493.88,364.5z`
-        default:
-            return ''
-    }
+		default:
+			return ''
+	}
 }
