@@ -1,8 +1,10 @@
-import { addAxis, colours } from "../node_modules/visual-components/index.js"
+import { addAxis, colours } from '../node_modules/visual-components/index.js'
 
-const includedFoods = ["Beef (beef herd)", "Lamb & Mutton", "Dark Chocolate",
-    "Cheese", "Shrimps (farmed)", "Coffee", "Fish (farmed)", "Pig Meat", "Palm Oil",
-    "Eggs", "Rice", "Nuts", "Milk", "Tofu", "Oatmeal", "Cassava", "Soy milk", "Bananas"]
+const animalBasedFoods = ['Beef (beef herd)', 'Lamb & Mutton', 'Cheese', 'Shrimps (farmed)',
+    'Fish (farmed)', 'Pig Meat', 'Poultry Meat', 'Eggs', 'Milk',]
+const plantBasedFoods = ['Dark Chocolate', 'Coffee', 'Palm Oil', 'Rice', 'Nuts', 'Tofu',
+    'Oatmeal', 'Soy milk', 'Bananas']
+const includedFoods = [...animalBasedFoods, ...plantBasedFoods]
 
 export const addChart = async (chartProps, theme = 'light') => {
     const { chart, width, height } = chartProps
@@ -20,7 +22,15 @@ export const addChart = async (chartProps, theme = 'light') => {
                 }
             })
             .map(d => { return { ...d, total: d.landUse + d.farm + d.animalFeed + d.others } })
-            .sort((a, b) => b.total - a.total)
+            .sort((a, b) => {
+                const isAanimal = animalBasedFoods.includes(a.food)
+                const isBanimal = animalBasedFoods.includes(b.food)
+
+                if (isAanimal && !isBanimal) return -1
+                else if (!isAanimal && isBanimal) return 1
+                else return b.total - a.total
+            })
+            .map(d => { return { ...d, food: formatFoodName(d.food) } })
         )
 
     const subgroups = ['landUse', 'farm', 'animalFeed', 'others']
@@ -63,9 +73,6 @@ export const addChart = async (chartProps, theme = 'light') => {
         .attr('width', d => x(d[1]) - x(d[0]))
         .attr('height', y.bandwidth())
 
-    console.log(data.map(d => d.food));
-
-
     addAxis({
         chart,
         width,
@@ -90,4 +97,25 @@ export const addChart = async (chartProps, theme = 'light') => {
 
 function convertNumber(number) {
     return +number > 0 ? +number : 0
+}
+
+function formatFoodName(food) {
+    switch (food) {
+        case 'Beef (beef herd)':
+            return 'Beef'
+        case 'Lamb & Mutton':
+            return 'Lamb'
+        case 'Shrimps (farmed)':
+            return 'Shrimp'
+        case 'Fish (farmed)':
+            return 'Fish'
+        case 'Pig Meat':
+            return 'Pig'
+        case 'Poultry Meat':
+            return 'Poultry'
+        case 'Dark Chocolate':
+            return 'Chocolate'
+        default:
+            return food
+    }
 }
