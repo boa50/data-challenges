@@ -75,7 +75,7 @@ export const addChart = async (chartProps, theme = 'light') => {
 
     chart
         .append('line')
-        .attr('x1', 0 - margin.left + 32)
+        .attr('x1', 0 - margin.left + 28)
         .attr('x2', width)
         .attr('y1', height / 2)
         .attr('y2', height / 2)
@@ -93,6 +93,7 @@ export const addChart = async (chartProps, theme = 'light') => {
         y,
         xLabel: 'CO₂-equivalents kg per food kg',
         yLabel: 'Food',
+        fontSize: '0.65rem',
         hideXdomain: true,
         hideYdomain: true
     })

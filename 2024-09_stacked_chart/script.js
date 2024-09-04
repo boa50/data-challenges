@@ -5,4 +5,4 @@ const chartId = appendChartContainer({ idNum: 0, chartTitle: 'Stacked' })
 
 await new Promise(r => setTimeout(r, 1))
 
-addChart(getChart({ id: chartId, margin: getMargin({ left: 108 }) }))
+addChart(getChart({ id: chartId, margin: getMargin({ left: 90, bottom: 46 }) }))
