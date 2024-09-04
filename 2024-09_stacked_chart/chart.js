@@ -1,9 +1,9 @@
 import { addAxis, colours } from '../node_modules/visual-components/index.js'
 
-const animalBasedFoods = ['Beef (beef herd)', 'Lamb & Mutton', 'Cheese', 'Shrimps (farmed)',
+const animalBasedFoods = ['Beef (beef herd)', 'Lamb & Mutton', 'Cheese', //'Shrimps (farmed)',
     'Fish (farmed)', 'Pig Meat', 'Poultry Meat', 'Eggs', 'Milk',]
 const plantBasedFoods = ['Dark Chocolate', 'Coffee', 'Palm Oil', 'Rice', 'Nuts', 'Tofu',
-    'Oatmeal', 'Soy milk', 'Bananas']
+    'Oatmeal', 'Soy milk']
 const includedFoods = [...animalBasedFoods, ...plantBasedFoods]
 
 export const addChart = async (chartProps, theme = 'light') => {
@@ -49,7 +49,7 @@ export const addChart = async (chartProps, theme = 'light') => {
     const colour = d3
         .scaleOrdinal()
         .domain(subgroups)
-        .range([palette.vermillion, palette.blue, palette.amber, palette.bluishGreen])
+        .range([palette.vermillion, palette.blue, palette.amber, d3.hsl(palette.axis).brighter(1.5)])
 
     const stackedData = d3
         .stack()
@@ -80,6 +80,8 @@ export const addChart = async (chartProps, theme = 'light') => {
         colour: palette.axis,
         x,
         y,
+        xLabel: 'CO₂-equivalents kg per food kg',
+        yLabel: 'Food',
         hideXdomain: true,
         hideYdomain: true
     })
