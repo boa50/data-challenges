@@ -7,7 +7,7 @@ const plantBasedFoods = ['Dark Chocolate', 'Coffee', 'Palm Oil', 'Rice', 'Nuts',
 const includedFoods = [...animalBasedFoods, ...plantBasedFoods]
 
 export const addChart = async (chartProps, theme = 'light') => {
-    const { chart, width, height } = chartProps
+    const { chart, width, height, margin } = chartProps
     const palette = theme === 'light' ? colours.paletteLightBg : colours.paletteDarkBg
     const data = await d3.csv('data/dataset.csv')
         .then(data => data
@@ -49,7 +49,7 @@ export const addChart = async (chartProps, theme = 'light') => {
     const colour = d3
         .scaleOrdinal()
         .domain(subgroups)
-        .range([palette.vermillion, palette.blue, palette.amber, d3.hsl(palette.axis).brighter(1.5)])
+        .range([palette.vermillion, palette.bluishGreen, palette.amber, d3.hsl(palette.axis).brighter(1.5)])
 
     const stackedData = d3
         .stack()
@@ -72,6 +72,39 @@ export const addChart = async (chartProps, theme = 'light') => {
         .attr('x', d => x(d[0]))
         .attr('width', d => x(d[1]) - x(d[0]))
         .attr('height', y.bandwidth())
+
+    chart
+        .append('line')
+        .attr('x1', 0 - margin.left + 32)
+        .attr('x2', width)
+        .attr('y1', height / 2)
+        .attr('y2', height / 2)
+        .attr('stroke', d3.hsl(palette.axis).brighter(2))
+        .attr('stroke-dasharray', '4 2')
+
+    chart
+        .append('text')
+        .attr('x', width / 1.05)
+        .attr('y', height / 2 - 32)
+        .attr('dominant-baseline', 'auto')
+        .attr('text-anchor', 'end')
+        .attr('font-size', '2rem')
+        .attr('font-weight', 500)
+        .attr('fill', palette.vermillion)
+        .attr('opacity', 0.5)
+        .text('Animal Based')
+
+    chart
+        .append('text')
+        .attr('x', width / 1.05)
+        .attr('y', height / 2 + 32)
+        .attr('dominant-baseline', 'hanging')
+        .attr('text-anchor', 'end')
+        .attr('font-size', '2rem')
+        .attr('font-weight', 500)
+        .attr('fill', palette.bluishGreen)
+        .attr('opacity', 0.5)
+        .text('Plant Based')
 
     addAxis({
         chart,
