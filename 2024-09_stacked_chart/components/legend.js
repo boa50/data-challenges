@@ -22,16 +22,16 @@ function plotSingleLegend(chart, text, colour, margin, yPosition) {
         colours: colour,
         xPosition: -margin.left,
         yPosition,
-        fontSize: '0.65rem'
+        fontSize: '0.5rem'
     })
 
     addLegend({
         chart,
         legends: [explanation],
         colours: colour,
-        xPosition: -margin.left + getTextWidth(title, '0.65rem') + 4,
+        xPosition: -margin.left + getTextWidth(title, '0.5rem') + 4,
         yPosition,
         fontWeight: 300,
-        fontSize: '0.6rem'
+        fontSize: '0.45rem'
     })
 }

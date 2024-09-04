@@ -1,8 +1,8 @@
 import { convertSizeToIntPx } from "../../node_modules/visual-components/index.js"
 
 export const addLabels = (chart, width, height, palette) => {
-	addLabel(chart, width, height, palette.vermillion, 'top', getImgPath('animal'), 'Animal Based')
-	addLabel(chart, width, height, palette.bluishGreen, 'bottom', getImgPath('plant'), 'Plant Based')
+	addLabel(chart, width, height, palette.vermillion, 'top', getImgPath('animal'), 'Animal-Based')
+	addLabel(chart, width, height, palette.bluishGreen, 'bottom', getImgPath('plant'), 'Plant-Based')
 }
 
 function addLabel(chart, width, height, colour, position, imgPath, text) {

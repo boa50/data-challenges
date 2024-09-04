@@ -21,7 +21,7 @@ export const plotAxis = (chart, width, height, palette, x, y) => {
         width,
         height,
         colour: palette.axis,
-        fontSize: '0.65rem',
+        fontSize: '0.5rem',
         x,
         y,
         xLabel: 'CO₂-equivalents kg per food kg',
