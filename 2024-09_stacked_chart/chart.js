@@ -1,5 +1,5 @@
 import { colours } from '../node_modules/visual-components/index.js'
-import { prepareData, plotGraph, addLabels, prepareAxis, plotAxis } from './components/script.js'
+import { prepareData, plotGraph, addLabels, prepareAxis, plotAxis, plotLegend } from './components/script.js'
 
 export const addChart = async (chartProps, theme = 'light') => {
     const { chart, width, height, margin } = chartProps
@@ -16,4 +16,5 @@ export const addChart = async (chartProps, theme = 'light') => {
     plotGraph(chart, data, subgroups, x, y, colour, width, height, margin, palette)
     addLabels(chart, width, height, palette)
     plotAxis(chart, width, height, palette, x, y)
+    plotLegend(chart, colour.range(), margin)
 }
