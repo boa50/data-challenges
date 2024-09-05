@@ -3,7 +3,7 @@ import { addChart } from "./chart.js"
 
 const chartId = appendChartContainer({
     idNum: 0,
-    chartTitle: 'Watch out what you eat!',
+    chartTitle: 'Watch out for what you eat!',
     chartSubtitle: 'Animal-based foods usually represent a considerable portion of CO₂ emissions in our diet. Some foods emit <strong>10-50</strong> times more CO₂ than a plant-based counterpart.',
     titleSize: 'text-3xl',
     subtitleSize: 'text-base'
