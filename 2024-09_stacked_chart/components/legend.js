@@ -9,18 +9,29 @@ export const plotLegend = (chart, colours, margin) => {
     ]
 
     for (let i = 0; i < legends.length; i++) {
-        plotSingleLegend(chart, legends[i], colours[i], margin, -margin.top + (14 * (i + 1)))
+        const xPosition = getTextWidth(legends[i - 1], '0.45rem') * (i % 2)
+
+        plotSingleLegend(
+            chart,
+            legends[i],
+            colours[i],
+            margin,
+            -margin.top + (14 * (Math.floor(i / 2) + 1)),
+            xPosition > 0 ? xPosition : undefined
+        )
     }
 }
 
-function plotSingleLegend(chart, text, colour, margin, yPosition) {
+function plotSingleLegend(chart, text, colour, margin, yPosition, xPosition) {
     const [title, explanation] = text.split(';;')
+    xPosition = xPosition === undefined ? -margin.left : xPosition - margin.left
+    const subtitleXposition = xPosition + getTextWidth(title, '0.5rem') + 4
 
     addLegend({
         chart,
         legends: [title],
         colours: colour,
-        xPosition: -margin.left,
+        xPosition,
         yPosition,
         fontSize: '0.5rem'
     })
@@ -29,7 +40,7 @@ function plotSingleLegend(chart, text, colour, margin, yPosition) {
         chart,
         legends: [explanation],
         colours: colour,
-        xPosition: -margin.left + getTextWidth(title, '0.5rem') + 4,
+        xPosition: subtitleXposition,
         yPosition,
         fontWeight: 300,
         fontSize: '0.45rem'
